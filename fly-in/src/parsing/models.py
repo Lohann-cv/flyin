@@ -187,3 +187,93 @@ class Network:
         if self._end is None:
             raise LookupError("THere's no end zone")
         return self._end
+
+    def add_zone(self, zone: Zone) -> None:
+        """Add a given zone to the network.
+
+        Arg:
+            zone: The zone to add.
+
+        Raises:
+            ValueError: If the name is taken, or a second start/end is added.
+        """
+        if zone.name in self._zones:
+            raise ValueError(f"zone '{zone.name}' already exists")
+        if zone.role is ZoneRole.START:
+            if self._start is not None:
+                raise ValueError("A start zone already exists")
+            self._start = zone
+        elif zone.role is ZoneRole.END:
+            if self._end is not None:
+                raise ValueError("An end zone already exists")
+            self._end = zone
+        self._zones[zone.name] = zone
+        self._adjacency[zone.name] = []
+
+    def add_connection(self, connection: Connection) -> None:
+        """Add a connection between two existing zones.
+
+        Arg:
+            connection: The connections to add.
+
+        Raise:
+            ValueError: If the second point is unknow, is the point or that the connection already exist.
+        """
+        for name in (connection.zone_a, connection.zone_b):
+            if name not in self._zones:
+                raise ValueError(f"Unknow zone '{name}'")
+        if connection.zone_a == connection.zone_b:
+            raise ValueError("A connection cannot loop on one zone")
+        if connection.key in self._connections:
+            raise ValueError(f"the connection '{connection.name}' already exists")
+        self._connections[connection.key] = connection
+        self._adjacency[connection.zone_a].append(connection)
+        self._adjacency[connection.zone_b].append(connection)
+
+    def has_zone(self, name: str) -> bool:
+        """Check if a zone with the given name already exists."""
+        return name in self._zones
+
+    def get_zone(self, name: str) -> Zone:
+        """Getter of a zone by it's name.
+
+        Raises:
+            KeyError: If there is no zone with such name.
+        """
+        return self._zones[name]
+
+    def has_connection(self, name_a: str, name_b: str) -> bool:
+        """Check if the two zones share a connection"""
+        return frozenset((name_a, name_b)) in self._connections
+
+    def get_connection(self, name_a: str, name_b: str) -> Connection:
+        """Getter for the connection between two zones.
+
+        Raise:
+            KeyError: If the zones are not linked.
+        """
+        return self._connections[frozenset((name_a, name_b))]
+
+    def connections_of(self, name:str) -> list[Connection]:
+        """Return the connections of a zone.
+
+        Raise:
+            KeyError: If the zone doesn't exists.
+        """
+        return list(self._adjacency[name])
+
+    def neighbors(self, name: str) -> list[Zone]:
+        """Return zones linked to a given zone in a list.
+
+        Raise:
+            KeyError: If the zone doesn't exists.
+        """
+        return [self._zones[connected.other(name)] for connected in self._adjacency[name]]
+
+    def zone_type_counts(self) -> dict[ZoneType, int]:
+        """Count the zones of each type."""
+        counts: dict[ZoneType, int] = {kind: 0 for kind in ZoneType}
+        for zone in self._zones.values():
+            counts[zone.zone_type] += 1
+        return counts
+
