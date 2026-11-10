@@ -35,3 +35,39 @@ class ZoneRole(Enum):
     START = "start"
     END = "end"
     REGULAR = "regular"
+
+
+
+@dataclass(frozen=True)
+class Zone:
+    """A zone in the graph
+
+    Attributes:
+        name: The id of the zone.
+        x: Integer x coordinate.
+        y: Integer y coordinate.
+        zone_type: Kind of zone (cost of entering it).
+        color: Optional color of the zone.
+        max_drones: Occupancy limit, the capacity property is used to get it.
+        role: Start, end or regular zone.
+    """
+
+    name: str
+    x: int
+    y: int
+    zone_type: ZoneType = ZoneType.NORMAL
+    color: str | None = None
+    max_drones: int = 1
+    role: ZoneRole = ZoneRole.REGULAR
+
+    @property
+    def capacity(self) -> int | None:
+        """The getter for the capacity of the zone
+
+        Return:
+            'None' for the start and end since it can hold as many drone as eeded
+            'max_drones' for the regular zones
+        """
+        if self.role is not ZoneRole.REGULAR:
+            return None
+        return self.max_drones
