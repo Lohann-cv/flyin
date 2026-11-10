@@ -173,6 +173,14 @@ class MapParser:
             )
         return int(text)
 
+    def _parse_positive_int(self, text: str, label: str, line_no: int) -> int:
+        """Parse an ASCII integer that must be positive."""
+        if not _POSITIVE_DIGITS.fullmatch(text):
+            raise ParseError(
+                f"{label} must be an integer, got '{text}'", line_no
+            )
+        return int(text)
+
     def _parse_zone(self, rest: str, role: ZoneRole, line_no: int) -> Zone:
         """Parse the zone infos : '<name> <x> <y> [metadata]' into a Zone."""
         head, meta_raw = self._split_metadata(rest)
@@ -259,7 +267,7 @@ class MapParser:
             )
         capacity = 1
         if "max_link_capacity" in meta:
-            capacity = self._parse_int(
+            capacity = self._parse_positive_int(
                 meta["max_link_capacity"], "max_link_capacity", line_no
             )
         return Connection(first, second, capacity)
