@@ -115,3 +115,75 @@ class Connection:
             return self.zone_a
         raise ValueError(f"'{zone_name}' is not an end of '{self.name}'")
 
+
+class Network:
+    """The graph of zones.
+
+    The graph is bidirectional, the zone are store and accesible by their name in a dict, so are the connections.
+    A adjaceny dict is used to be able to know wich zone are acceible by another zone.
+    """
+
+    def __init__(self, nb_drones: int) -> None:
+        """Create an empty network.
+
+        Args:
+            nb_drones: The number of drones.
+
+        Raises:
+            ValueError: If the 'nb_drones' is not strictly positive.
+        """
+        if nb_drones <= 0:
+            raise ValueError("There must be at least one drone")
+        self._nb_drones: int = nb_drones
+        self._zones: dict[str, Zone] = {}
+        self._connections: dict[frozenset[str], Connection] = {}
+        self._adjacency: dict[str, list[Connection]] = {}
+        self._start: Zone | None = None
+        self._end: Zone | None = None
+
+    @property
+    def nb_drones(self) -> int:
+        """Getter for the '_nb_drones'."""
+        return self._nb_drones
+
+    @property
+    def zones(self) -> list[Zone]:
+        """Getter for Zone infos"""
+        return list(self._zones.values())
+
+    @property
+    def connections(self) -> list[Connection]:
+        """Getter for connections info"""
+        return list(self._connections.values())
+
+    @property
+    def has_start(self) -> bool:
+        """Check if there's a start zone"""
+        return self._start is not None
+
+    @property
+    def has_end(self) -> bool:
+        """Check if there's an end zone"""
+        return self._end is not None
+
+    @property
+    def start(self) -> Zone:
+        """Getter for the start zone
+
+        Raises:
+            LookupError: If no start zone has been added yet.
+        """
+        if self._start is None:
+            raise LookupError("There's no start zone")
+        return self._start
+
+    @property
+    def end(self) -> Zone:
+        """Getter for the end zone
+
+        Raises:
+            LookupError: If no end zone has been added yet.
+        """
+        if self._end is None:
+            raise LookupError("THere's no end zone")
+        return self._end
