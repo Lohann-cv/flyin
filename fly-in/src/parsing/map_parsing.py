@@ -156,3 +156,110 @@ class MapParser:
             raise ParseError("No 'end_hub'")
         return network
 
+    def _strip_comment(self, raw: str) -> str:
+        """Remove the '#' comment"""
+        return raw.partition("#")[0].strip()
+
+    def _split_metadata(self, rest: str) -> tuple[str, str]:
+        """Split 'head [metadata]' into a tuple of ('head', '[metadata]')."""
+        head, bracket, tail = rest.partition("[")
+        return head, bracket + tail
+
+    def _parse_int(self, text: str, label: str, line_no: int) -> int:
+        """Parse an ASCII integer."""
+        if not _INTEGER.fullmatch(text):
+            raise ParseError(
+                f"{label} must be an integer, got '{text}'", line_no
+            )
+        return int(text)
+
+    def _parse_zone(self, rest: str, role: ZoneRole, line_no: int) -> Zone:
+        """Parse the zone infos : '<name> <x> <y> [metadata]' into a Zone."""
+        head, meta_raw = self._split_metadata(rest)
+        tokens = head.split()
+        if len(tokens) != 3:
+            raise ParseError(
+                f"expected '<name> <x> <y>', got {len(tokens)} value(s)",
+                line_no
+            )
+        name, x_text, y_text = tokens
+        self._check_zone_name(name, line_no)
+        x = self._parse_int(x_text, "x coordinate", line_no)
+        y = self._parse_int(y_text, "y coordinate", line_no)
+        meta = self._metadata.parse(meta_raw, _ZONE_KEYS, line_no)
+        type_text = meta.get("zone", ZoneType.NORMAL.value)
+        try:
+            zone_type = ZoneType(type_text)
+        except ValueError:
+            valid = ", ".join(kind.value for kind in ZoneType)
+            raise ParseError(
+                f"Invalid zone type '{type_text}' (expected: {valid})",
+                line_no
+            ) from None
+        max_drones = 1
+        if role is ZoneRole.REGULAR and "max_drones" in meta:
+            max_drones = self._parse_int(
+                meta["max_drones"], "max_drones", line_no
+            )
+        return Zone(
+            name=name,
+            x=x,
+            y=y,
+            zone_type=zone_type,
+            color=meta.get("color"),
+            max_drones=max_drones,
+            role=role,
+        )
+
+    def _check_zone_name(self, name: str, line_no: int) -> None:
+        """Check if the name follow the syntax rule"""
+        for char in name:
+            if char in _FORBIDDEN_NAME_CHARS:
+                raise ParseError(
+                    f"Invalide character '{char}' in zone name '{name}'",
+                    line_no
+                )
+
+    def _register_zone(
+        self, network: Network, zone: Zone, line_no: int
+    ) -> None:
+        """Add a zone to the network"""
+        if network.has_zone(zone.name):
+            raise ParseError(f"Zone '{zone.name}' is already defined", line_no)
+        if zone.role is ZoneRole.START and network.has_start:
+            raise ParseError("'start_hub' is defined more than once", line_no)
+        if zone.role is ZoneRole.END and network.has_end:
+            raise ParseError("'end_hub' is defined more than once", line_no)
+        network.add_zone(zone)
+
+    def _parse_connection(
+        self, network: Network, rest: str, line_no: int
+    ) -> Connection:
+        """Parse '<zone1>-<zone2> [metadata]' into a Connection."""
+        head, meta_raw = self._split_metadata(rest)
+        tokens = head.split()
+        if len(tokens) != 1:
+            raise ParseError("Expected '<zone1>-<zone2>'", line_no)
+        names = tokens[0].split("-")
+        if len(names) != 2 or not all(names):
+            raise ParseError(
+                f"'{tokens[0]}' must be exactly '<zone1>-<zone2>'", line_no
+            )
+        first, second = names
+        meta = self._metadata.parse(meta_raw, _CONNECTION_KEYS, line_no)
+        if first == second:
+            raise ParseError(f"Zone '{first}' linked to itself", line_no)
+        for name in names:
+            if not network.has_zone(name):
+                raise ParseError(f"Unknown zone '{name}'", line_no)
+        if network.has_connection(first, second):
+            raise ParseError(
+                f"Connection '{first}-{second}' is already defined",
+                line_no
+            )
+        capacity = 1
+        if "max_link_capacity" in meta:
+            capacity = self._parse_int(
+                meta["max_link_capacity"], "max_link_capacity", line_no
+            )
+        return Connection(first, second, capacity)
