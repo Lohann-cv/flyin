@@ -27,3 +27,11 @@ class ZoneType(Enum):
             return 1
         if self is ZoneType.RESTRICTED:
             return 2
+
+
+class ZoneRole(Enum):
+    """The role of a zone in the network"""
+
+    START = "start"
+    END = "end"
+    REGULAR = "regular"
