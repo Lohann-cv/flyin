@@ -71,3 +71,47 @@ class Zone:
         if self.role is not ZoneRole.REGULAR:
             return None
         return self.max_drones
+
+
+@dataclass(frozen=True)
+class Connection:
+    """A bidirectional edge between two zones.
+
+    Attributes:
+        zone_a: Name of the first zone.
+        zone_b: Name of the second zone.
+        max_link_capacity: Max dones on a link, 1 by default.
+    """
+
+    zone_a: str
+    zone_b: str
+    max_link_capacity: int = 1
+
+    @property
+    def key(self) -> frozenset[str]:
+        """Getter for zones name of a connecton"""
+        return frozenset((self.zone_a, self.zone_b))
+
+    @property
+    def name(self) -> str:
+        """use to print the connection"""
+        return f"{self.zone_a} - {self.zone_b}"
+
+    def other(self, zone_name: str) -> str:
+        """Return the other end of the connection.
+
+        Arg:
+            zone_name: One of the two point of the connection.
+
+        Return:
+            The name of the other point of the connection.
+
+        Raises:
+            ValueError: If 'zone_name' is not a point of the instence.
+        """
+        if zone_name == self.zone_a:
+            return self.zone_b
+        if zone_name == self.zone_b:
+            return self.zone_a
+        raise ValueError(f"'{zone_name}' is not an end of '{self.name}'")
+
