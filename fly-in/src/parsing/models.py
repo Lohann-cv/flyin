@@ -277,3 +277,16 @@ class Network:
             counts[zone.zone_type] += 1
         return counts
 
+    def describe(self) -> str:
+        """Return a summary of the graph, used for debug"""
+        counts = " ".join(
+                f"{kind.value}={n}" for kind, n in self.zone_type_counts().items()
+                )
+        return "\n".join(
+                [
+                    f"Drones: {self._nb_drones}",
+                    f"Zones: {len(self._zones)} ({counts})",
+                    f"Connections: {len(self._connections)}",
+                    f"Start: {self.start.name} End: {self.end.name}"
+                ]
+            )
