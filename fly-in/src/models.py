@@ -246,14 +246,6 @@ class Network:
         """Check if the two zones share a connection"""
         return frozenset((name_a, name_b)) in self._connections
 
-    def get_connection(self, name_a: str, name_b: str) -> Connection:
-        """Getter for the connection between two zones.
-
-        Raise:
-            KeyError: If the zones are not linked.
-        """
-        return self._connections[frozenset((name_a, name_b))]
-
     def connections_of(self, name:str) -> list[Connection]:
         """Return the connections of a zone.
 
@@ -276,17 +268,3 @@ class Network:
         for zone in self._zones.values():
             counts[zone.zone_type] += 1
         return counts
-
-    def describe(self) -> str:
-        """Return a summary of the graph, used for debug"""
-        counts = " ".join(
-                f"{kind.value}={n}" for kind, n in self.zone_type_counts().items()
-                )
-        return "\n".join(
-                [
-                    f"Drones: {self._nb_drones}",
-                    f"Zones: {len(self._zones)} ({counts})",
-                    f"Connections: {len(self._connections)}",
-                    f"Start: {self.start.name} End: {self.end.name}"
-                ]
-            )
