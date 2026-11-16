@@ -7,8 +7,8 @@ The parsing follow a chain of steps:
 import re
 from collections.abc import Iterable
 from pathlib import Path
-from errors import ParseError
-from models import Connection, Network, Zone, ZoneRole, ZoneType
+from src.errors import ParseError
+from src.models import Connection, Network, Zone, ZoneRole, ZoneType
 
 _ZONE_KEYS = frozenset({"zone", "color", "max_drones"})
 _CONNECTION_KEYS = frozenset({"max_link_capacity"})

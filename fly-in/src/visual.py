@@ -6,8 +6,8 @@ The view is rebuild turn after turn
 
 import re
 from dataclasses import dataclass
-from models import Network, Zone, ZoneType
-from simulation import Move, MoveKind, Plan
+from src.models import Network, Zone, ZoneType
+from src.simulation import Move, MoveKind, Plan
 
 COLOR_CODES: dict[str, int] = {
     "black": 244, "gray": 245, "grey": 245, "silver": 250, "white": 255,

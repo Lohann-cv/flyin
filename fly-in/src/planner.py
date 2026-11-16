@@ -5,10 +5,10 @@ Basicaly they all set a path with the algorithm (it's a copy of dijkstra were yo
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from errors import NoPathError
-from graph_search import GraphSearch
-from models import Connection, Network, Zone, ZoneType
-from simulation import Move, MoveKind, Plan
+from src.errors import NoPathError
+from src.graph_search import GraphSearch
+from src.models import Connection, Network, Zone, ZoneType
+from src.simulation import Move, MoveKind, Plan
 
 MOVE_COST = 2
 PRIORITY_MOVE_COST = 1
