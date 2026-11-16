@@ -70,6 +70,7 @@ class MetadataParser:
             meta[key] = value
         return meta
 
+
 class MapParser:
     """Turns a map file into a graph ('Network')."""
 

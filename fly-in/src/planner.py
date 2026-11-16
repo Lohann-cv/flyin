@@ -1,6 +1,8 @@
 """The planner: the drones leave one after the other, each as fast as it can.
 
-Basicaly they all set a path with the algorithm (it's a copy of dijkstra were you check if the zone/connection isn't full on the turn where the drone need it).
+Basicaly they all set a path with the algorithm
+(it's a copy of dijkstra were you check if the zone/connection
+isn't full on the turn where the drone need it).
 """
 
 from collections import Counter, defaultdict
@@ -12,6 +14,7 @@ from src.simulation import Move, MoveKind, Plan
 
 MOVE_COST = 2
 PRIORITY_MOVE_COST = 1
+
 
 @dataclass(frozen=True)
 class _Step:
@@ -178,10 +181,12 @@ class Planner:
         arrival: _Arrival,
         reserved: Reservations,
     ) -> None:
-        """From (zone, instant), if you cannot move, wait if you can move then move."""
+        """From (zone, instant), if you cannot move,
+        wait if you can move then move."""
         network = self._network
         zone = network.get_zone(name)
-        if reserved.zone_has_room(zone, instant + 1): # Double it and give it to the next persone
+        if reserved.zone_has_room(zone, instant + 1):
+            # Double it and give it to the next persone
             self._offer(
                 reached, instant + 1, zone, _Arrival(
                     arrival.cost, (name, instant), None

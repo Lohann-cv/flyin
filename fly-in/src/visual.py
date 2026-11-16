@@ -28,7 +28,9 @@ LINE_WIDTH = 100
 """Utils"""
 
 ESCAPE_CODES = re.compile(r"\033\[[0-9;]*m")
-"""The regex to take the color code we take every number including ';' and it's a style command"""
+"""The regex to take the color code we take every number
+including ';' and it's a style command"""
+
 
 class Painter:
     """Adds terminal colors to a text."""
@@ -166,7 +168,9 @@ class TerminalView:
             items: The items, possibly painted.
 
         Returns:
-            The lines. The items are separated by three spaces, and a new line starts before the line would be wider than `LINE_WIDTH`.
+            The lines. The items are separated by three spaces,
+            and a new line starts before the line would be wider
+            than `LINE_WIDTH`.
         """
         if not items:
             return []

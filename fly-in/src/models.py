@@ -1,7 +1,9 @@
-"""The classes that represent the drone network: zones, connections and the graph."""
+"""The classes that represent the drone network:
+    zones, connections and the graph."""
 
 from dataclasses import dataclass
 from enum import Enum
+
 
 class ZoneType(Enum):
     """The types of zone and the price to enter them"""
@@ -37,7 +39,6 @@ class ZoneRole(Enum):
     REGULAR = "regular"
 
 
-
 @dataclass(frozen=True)
 class Zone:
     """A zone in the graph
@@ -48,7 +49,8 @@ class Zone:
         y: Integer y coordinate.
         zone_type: Kind of zone (cost of entering it).
         color: Optional color of the zone.
-        max_drones: Occupancy limit, the capacity property is used to get it.
+        max_drones: Occupancy limit, the capacity property
+        is used to get it.
         role: Start, end or regular zone.
     """
 
@@ -65,7 +67,8 @@ class Zone:
         """The getter for the capacity of the zone
 
         Return:
-            'None' for the start and end since it can hold as many drone as eeded
+            'None' for the start and end since it
+            can hold as many drone as eeded
             'max_drones' for the regular zones
         """
         if self.role is not ZoneRole.REGULAR:
@@ -113,14 +116,18 @@ class Connection:
             return self.zone_b
         if zone_name == self.zone_b:
             return self.zone_a
-        raise ValueError(f"'{zone_name}' is not an end of '{self.name}'")
+        raise ValueError(
+                f"'{zone_name}' is not an end of '{self.name}'"
+                )
 
 
 class Network:
     """The graph of zones.
 
-    The graph is bidirectional, the zone are store and accesible by their name in a dict, so are the connections.
-    A adjaceny dict is used to be able to know wich zone are acceible by another zone.
+    The graph is bidirectional, the zone are store
+    and accesible by their name in a dict, so are the connections.
+    A adjaceny dict is used to be able to know
+    wich zone are acceible by another zone.
     """
 
     def __init__(self, nb_drones: int) -> None:
@@ -217,7 +224,8 @@ class Network:
             connection: The connections to add.
 
         Raise:
-            ValueError: If the second point is unknow, is the point or that the connection already exist.
+            ValueError: If the second point is unknow,
+            is the point or that the connection already exist.
         """
         for name in (connection.zone_a, connection.zone_b):
             if name not in self._zones:
@@ -225,7 +233,9 @@ class Network:
         if connection.zone_a == connection.zone_b:
             raise ValueError("A connection cannot loop on one zone")
         if connection.key in self._connections:
-            raise ValueError(f"the connection '{connection.name}' already exists")
+            raise ValueError(
+                    f"the connection '{connection.name}' already exists"
+                    )
         self._connections[connection.key] = connection
         self._adjacency[connection.zone_a].append(connection)
         self._adjacency[connection.zone_b].append(connection)
@@ -246,7 +256,7 @@ class Network:
         """Check if the two zones share a connection"""
         return frozenset((name_a, name_b)) in self._connections
 
-    def connections_of(self, name:str) -> list[Connection]:
+    def connections_of(self, name: str) -> list[Connection]:
         """Return the connections of a zone.
 
         Raise:
@@ -260,7 +270,10 @@ class Network:
         Raise:
             KeyError: If the zone doesn't exists.
         """
-        return [self._zones[connected.other(name)] for connected in self._adjacency[name]]
+        return [
+            self._zones[connected.other(name)]
+            for connected in self._adjacency[name]
+        ]
 
     def zone_type_counts(self) -> dict[ZoneType, int]:
         """Count the zones of each type."""

@@ -1,4 +1,5 @@
-"""The Move and Plan model, a Plan hold a list of all the move per turn, and is able tu format them for printing."""
+"""The Move and Plan model, a Plan hold a list of all
+the move per turn, and is able tu format them for printing."""
 
 from dataclasses import dataclass
 from enum import Enum
@@ -11,7 +12,8 @@ class MoveKind(Enum):
     """Move to a zone that costs one turn."""
 
     DEPART = "depart"
-    """First turn of a crossing towards a restricted zone (it takes 2 turns)."""
+    """First turn of a crossing towards a restricted
+    zone (it takes 2 turns)."""
 
     ARRIVE = "arrive"
     """Second turn of the crossing: the drone reaches the zone."""

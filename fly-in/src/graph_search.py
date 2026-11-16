@@ -5,9 +5,10 @@
 from collections import deque
 from src.models import Network, Zone, ZoneRole, ZoneType
 
+
 class GraphSearch:
     """Searches for ONE drone, without any capacity constraint.
-    
+
     It is used to check if the graph is solvable
     """
 

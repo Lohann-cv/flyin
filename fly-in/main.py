@@ -55,7 +55,9 @@ if __name__ == "__main__":
             print(line)
         sys.exit(0)
 
-    colors = sys.stdout.isatty() and "NO_COLOR" not in os.environ # Check if color can be outputed, to be fair I don't know if it will be tested
+    colors = sys.stdout.isatty() and "NO_COLOR" not in os.environ
+    # Check if color can be outputed
+    # to be fair I don't know if it will be tested
     frames = TerminalView(network, plan, Painter(colors)).frames()
     try:
         for number, frame in enumerate(frames):
